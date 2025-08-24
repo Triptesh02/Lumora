@@ -4,20 +4,94 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lumora 9.0</title>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <!-- Combined CSS -->
 <style>
-body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f5f5f5; }
-header { background:#3b82f6; color:white; padding:1rem; display:flex; align-items:center; gap:1rem; }
-header .logo { width:50px; height:50px; }
-nav { background:#1e40af; padding:0.5rem; }
-nav button { margin-right:0.5rem; padding:0.5rem 1rem; color:white; background:#2563eb; border:none; cursor:pointer; }
-main { padding:1rem; }
-section { margin-bottom:2rem; }
-textarea { width:100%; height:100px; }
-</style>
+/* Reset & body */
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f6f8; color:#1f2937; }
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+/* Header */
+header {
+    background:linear-gradient(90deg,#3b82f6,#2563eb);
+    color:white;
+    padding:1rem 2rem;
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    box-shadow:0 2px 6px rgba(0,0,0,0.15);
+}
+header .logo { width:50px; height:50px; border-radius:8px; }
+
+/* Navbar */
+nav {
+    display:flex;
+    justify-content:center;
+    background:#1e40af;
+    padding:0.5rem 0;
+}
+nav button {
+    margin:0 0.5rem;
+    padding:0.6rem 1.2rem;
+    color:white;
+    background:#2563eb;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:600;
+    transition:0.3s;
+}
+nav button:hover { background:#3b82f6; }
+
+/* Main section */
+main { padding:2rem; max-width:1200px; margin:0 auto; }
+section { display:none; margin-bottom:2rem; }
+section.active { display:block; }
+
+/* Cards */
+.card {
+    background:white;
+    padding:1.5rem;
+    margin-bottom:1.5rem;
+    border-radius:10px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.08);
+}
+
+/* Inputs & Buttons */
+input[type="file"], input[type="text"], textarea {
+    width:100%;
+    padding:0.8rem;
+    margin:0.5rem 0 1rem 0;
+    border-radius:6px;
+    border:1px solid #cbd5e1;
+    font-size:1rem;
+}
+button.upload-btn {
+    background:#10b981; color:white; border:none;
+    padding:0.7rem 1.5rem; border-radius:6px;
+    font-weight:600; cursor:pointer;
+    transition:0.3s;
+}
+button.upload-btn:hover { background:#059669; }
+
+/* Paper list */
+ul { list-style:none; }
+ul li { padding:0.5rem 0; border-bottom:1px solid #e2e8f0; }
+
+/* Collaboration notes */
+#sharedNotes li { padding:0.5rem; border-left:4px solid #3b82f6; margin-bottom:0.5rem; background:#f1f5f9; border-radius:4px; }
+
+/* Charts */
+canvas { margin-top:1rem; background:white; border-radius:10px; padding:1rem; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
+
+/* Responsive */
+@media(max-width:768px){
+    header { flex-direction:column; text-align:center; gap:0.5rem; }
+    nav { flex-direction:column; gap:0.5rem; }
+}
+</style>
 </head>
 <body>
 
@@ -34,40 +108,57 @@ textarea { width:100%; height:100px; }
 
 <main>
     <!-- Dashboard -->
-    <section id="dashboard">
-        <h2>Dashboard</h2>
-        <input type="file" id="pdfUpload">
-        <button onclick="mockUpload()">Upload & Summarize</button>
-        <ul id="paperList"></ul>
+    <section id="dashboard" class="active">
+        <div class="card">
+            <h2>Upload Research Paper</h2>
+            <input type="file" id="pdfUpload">
+            <button class="upload-btn" onclick="mockUpload()">Upload & Summarize</button>
+        </div>
+        <div class="card">
+            <h2>Uploaded Papers</h2>
+            <ul id="paperList"></ul>
+        </div>
     </section>
 
     <!-- Analytics -->
-    <section id="analytics" style="display:none">
-        <h2>Analytics</h2>
-        <canvas id="categoryChart" width="400" height="200"></canvas>
-        <canvas id="summaryChart" width="400" height="200"></canvas>
-        <canvas id="teamContributionChart" width="400" height="200"></canvas>
-        <canvas id="teamCategoryChart" width="400" height="200"></canvas>
+    <section id="analytics">
+        <div class="card">
+            <h2>Category Distribution</h2>
+            <canvas id="categoryChart" width="400" height="200"></canvas>
+        </div>
+        <div class="card">
+            <h2>Summary Word Count</h2>
+            <canvas id="summaryChart" width="400" height="200"></canvas>
+        </div>
+        <div class="card">
+            <h2>Team Contribution</h2>
+            <canvas id="teamContributionChart" width="400" height="200"></canvas>
+        </div>
+        <div class="card">
+            <h2>Team Category Distribution</h2>
+            <canvas id="teamCategoryChart" width="400" height="200"></canvas>
+        </div>
     </section>
 
     <!-- Collaboration -->
-    <section id="collaboration" style="display:none">
-        <h2>Collaboration Room</h2>
-        <input type="text" id="roomName" placeholder="Room Name">
-        <textarea id="collabNote" placeholder="Write a note..."></textarea>
-        <button onclick="shareNote()">Share Note</button>
-        <ul id="sharedNotes"></ul>
+    <section id="collaboration">
+        <div class="card">
+            <h2>Collaboration Room</h2>
+            <input type="text" id="roomName" placeholder="Room Name">
+            <textarea id="collabNote" placeholder="Write a note..."></textarea>
+            <button class="upload-btn" onclick="shareNote()">Share Note</button>
+            <ul id="sharedNotes"></ul>
+        </div>
     </section>
 </main>
 
 <!-- Combined JS -->
 <script>
-let papers = [];
-let sharedNotes = [];
+let papers = [], sharedNotes = [];
 
 function showSection(sectionId){
-    document.querySelectorAll('main section').forEach(sec=>sec.style.display='none');
-    document.getElementById(sectionId).style.display='block';
+    document.querySelectorAll('main section').forEach(sec=>sec.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
 }
 
 function mockUpload(){
@@ -77,14 +168,12 @@ function mockUpload(){
     const summary = 'This is a mocked summary of the paper.';
     const categories = ['Astrophysics','Thermodynamics'];
     papers.push({title, summary, categories});
-    updatePaperList();
-    updateAnalytics();
+    updatePaperList(); updateAnalytics();
     alert('Paper uploaded and summarized (mock).');
 }
 
 function updatePaperList(){
-    const ul = document.getElementById('paperList');
-    ul.innerHTML='';
+    const ul = document.getElementById('paperList'); ul.innerHTML='';
     papers.forEach(p=>{
         const li = document.createElement('li');
         li.innerHTML = `<strong>${p.title}</strong> - Categories: ${p.categories.join(', ')}`;
@@ -115,7 +204,7 @@ function updateAnalytics(){
     if(window.userChart) window.userChart.destroy();
     window.userChart = new Chart(contribCtx,{
         type:'bar',
-        data:{labels:['You'], datasets:[{label:'Papers Uploaded', data:[papers.length], backgroundColor:'#f59e0b'}]},
+        data:{labels:['You'], datasets:[{label:'Papers Uploaded', data:[papers.length], backgroundColor:'#10b981'}]},
         options:{responsive:true, plugins:{legend:{display:false}}}
     });
 
@@ -128,23 +217,4 @@ function updateAnalytics(){
 }
 
 function shareNote(){
-    const note = document.getElementById('collabNote').value;
-    if(!note) return;
-    sharedNotes.push({username:'You', note});
-    updateNotes();
-    document.getElementById('collabNote').value='';
-}
-
-function updateNotes(){
-    const ul = document.getElementById('sharedNotes');
-    ul.innerHTML='';
-    sharedNotes.forEach(n=>{
-        const li = document.createElement('li');
-        li.innerHTML=`<strong>${n.username}:</strong> ${n.note}`;
-        ul.appendChild(li);
-    });
-}
-</script>
-
-</body>
-</html>
+    const note = document.getElementById('collabNote').
