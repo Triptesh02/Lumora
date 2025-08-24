@@ -3,218 +3,152 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumora 9.0</title>
-<!-- Chart.js -->
+<title>Lumora 9.0 Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- Combined CSS -->
 <style>
-/* Reset & body */
-* { box-sizing:border-box; margin:0; padding:0; }
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f6f8; color:#1f2937; }
-
-/* Header */
-header {
-    background:linear-gradient(90deg,#3b82f6,#2563eb);
-    color:white;
-    padding:1rem 2rem;
-    display:flex;
-    align-items:center;
-    gap:1rem;
-    box-shadow:0 2px 6px rgba(0,0,0,0.15);
+/* Root colors & dark mode */
+:root {
+    --primary: #3b82f6;
+    --secondary: #2563eb;
+    --accent: #10b981;
+    --bg-light: #f4f6f8;
+    --bg-dark: #1f2937;
+    --text-light: #f9fafb;
+    --text-dark: #1f2937;
 }
-header .logo { width:50px; height:50px; border-radius:8px; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; display:flex; transition:0.3s; background:var(--bg-light); color:var(--text-dark); }
+body.dark { background:var(--bg-dark); color:var(--text-light); }
 
-/* Navbar */
-nav {
-    display:flex;
-    justify-content:center;
-    background:#1e40af;
-    padding:0.5rem 0;
+/* Sidebar */
+aside {
+    width:220px; background:var(--primary); min-height:100vh; display:flex; flex-direction:column; padding:2rem 1rem; box-shadow:2px 0 6px rgba(0,0,0,0.15);
 }
-nav button {
-    margin:0 0.5rem;
-    padding:0.6rem 1.2rem;
-    color:white;
-    background:#2563eb;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-    font-weight:600;
+aside h2 { color:white; margin-bottom:2rem; text-align:center; }
+aside button {
+    background:transparent; border:none; color:white; padding:0.8rem 1rem; margin:0.2rem 0; border-radius:6px; cursor:pointer; text-align:left; font-weight:600;
     transition:0.3s;
 }
-nav button:hover { background:#3b82f6; }
+aside button:hover { background:var(--secondary); }
 
-/* Main section */
-main { padding:2rem; max-width:1200px; margin:0 auto; }
-section { display:none; margin-bottom:2rem; }
-section.active { display:block; }
+/* Main content */
+main { flex:1; padding:2rem; display:flex; flex-direction:column; gap:1.5rem; }
 
-/* Cards */
-.card {
-    background:white;
-    padding:1.5rem;
-    margin-bottom:1.5rem;
-    border-radius:10px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.08);
-}
+/* Card style */
+.card { background:white; padding:1.5rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.08); transition:0.3s; }
+body.dark .card { background:#374151; color:white; }
 
-/* Inputs & Buttons */
-input[type="file"], input[type="text"], textarea {
-    width:100%;
-    padding:0.8rem;
-    margin:0.5rem 0 1rem 0;
-    border-radius:6px;
-    border:1px solid #cbd5e1;
-    font-size:1rem;
-}
-button.upload-btn {
-    background:#10b981; color:white; border:none;
-    padding:0.7rem 1.5rem; border-radius:6px;
-    font-weight:600; cursor:pointer;
-    transition:0.3s;
-}
-button.upload-btn:hover { background:#059669; }
+/* Buttons & inputs */
+input, textarea { width:100%; padding:0.8rem; margin:0.5rem 0 1rem 0; border-radius:6px; border:1px solid #cbd5e1; font-size:1rem; transition:0.3s; }
+body.dark input, body.dark textarea { background:#1f2937; border:1px solid #4b5563; color:white; }
+button.upload-btn, button.toggle-btn { background:var(--accent); color:white; border:none; padding:0.7rem 1.5rem; border-radius:6px; font-weight:600; cursor:pointer; transition:0.3s; }
+button.upload-btn:hover, button.toggle-btn:hover { background:#059669; }
 
-/* Paper list */
-ul { list-style:none; }
-ul li { padding:0.5rem 0; border-bottom:1px solid #e2e8f0; }
+/* Lists */
+ul { list-style:none; padding-left:0; }
+ul li { padding:0.5rem; border-bottom:1px solid #e2e8f0; border-radius:4px; }
+body.dark ul li { border-bottom:1px solid #4b5563; }
 
 /* Collaboration notes */
-#sharedNotes li { padding:0.5rem; border-left:4px solid #3b82f6; margin-bottom:0.5rem; background:#f1f5f9; border-radius:4px; }
+#sharedNotes li { padding:0.5rem; border-left:4px solid var(--primary); margin-bottom:0.5rem; background:#f1f5f9; border-radius:4px; }
+body.dark #sharedNotes li { background:#4b5563; }
 
 /* Charts */
 canvas { margin-top:1rem; background:white; border-radius:10px; padding:1rem; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
+body.dark canvas { background:#374151; }
 
 /* Responsive */
 @media(max-width:768px){
-    header { flex-direction:column; text-align:center; gap:0.5rem; }
-    nav { flex-direction:column; gap:0.5rem; }
+    body { flex-direction:column; }
+    aside { width:100%; flex-direction:row; overflow-x:auto; padding:1rem; }
+    aside button { flex:1; text-align:center; margin:0 0.2rem; }
 }
 </style>
 </head>
 <body>
 
-<header>
-    <img src="assets/logo.png" alt="Lumora Logo" class="logo">
-    <h1>Lumora 9.0</h1>
-</header>
-
-<nav>
+<aside>
+    <h2>Lumora 9.0</h2>
     <button onclick="showSection('dashboard')">Dashboard</button>
     <button onclick="showSection('analytics')">Analytics</button>
     <button onclick="showSection('collaboration')">Collaboration</button>
-</nav>
+    <button class="toggle-btn" onclick="toggleDark()">Toggle Dark Mode</button>
+</aside>
 
 <main>
     <!-- Dashboard -->
-    <section id="dashboard" class="active">
-        <div class="card">
-            <h2>Upload Research Paper</h2>
-            <input type="file" id="pdfUpload">
-            <button class="upload-btn" onclick="mockUpload()">Upload & Summarize</button>
-        </div>
-        <div class="card">
-            <h2>Uploaded Papers</h2>
-            <ul id="paperList"></ul>
-        </div>
+    <section id="dashboard" class="active card">
+        <h2>Upload Research Paper</h2>
+        <input type="file" id="pdfUpload">
+        <button class="upload-btn" onclick="mockUpload()">Upload & Summarize</button>
+        <h3>Uploaded Papers</h3>
+        <ul id="paperList"></ul>
     </section>
 
     <!-- Analytics -->
-    <section id="analytics">
-        <div class="card">
-            <h2>Category Distribution</h2>
-            <canvas id="categoryChart" width="400" height="200"></canvas>
-        </div>
-        <div class="card">
-            <h2>Summary Word Count</h2>
-            <canvas id="summaryChart" width="400" height="200"></canvas>
-        </div>
-        <div class="card">
-            <h2>Team Contribution</h2>
-            <canvas id="teamContributionChart" width="400" height="200"></canvas>
-        </div>
-        <div class="card">
-            <h2>Team Category Distribution</h2>
-            <canvas id="teamCategoryChart" width="400" height="200"></canvas>
-        </div>
+    <section id="analytics" class="card">
+        <h2>Category Distribution</h2>
+        <canvas id="categoryChart" width="400" height="200"></canvas>
+
+        <h2>Summary Word Count</h2>
+        <canvas id="summaryChart" width="400" height="200"></canvas>
+
+        <h2>Team Contribution</h2>
+        <canvas id="teamContributionChart" width="400" height="200"></canvas>
+
+        <h2>Team Category Distribution</h2>
+        <canvas id="teamCategoryChart" width="400" height="200"></canvas>
     </section>
 
     <!-- Collaboration -->
-    <section id="collaboration">
-        <div class="card">
-            <h2>Collaboration Room</h2>
-            <input type="text" id="roomName" placeholder="Room Name">
-            <textarea id="collabNote" placeholder="Write a note..."></textarea>
-            <button class="upload-btn" onclick="shareNote()">Share Note</button>
-            <ul id="sharedNotes"></ul>
-        </div>
+    <section id="collaboration" class="card">
+        <h2>Collaboration Room</h2>
+        <input type="text" id="roomName" placeholder="Room Name">
+        <textarea id="collabNote" placeholder="Write a note..."></textarea>
+        <button class="upload-btn" onclick="shareNote()">Share Note</button>
+        <ul id="sharedNotes"></ul>
     </section>
 </main>
 
-<!-- Combined JS -->
 <script>
-let papers = [], sharedNotes = [];
+// Dark mode toggle
+function toggleDark() { document.body.classList.toggle('dark'); }
 
-function showSection(sectionId){
-    document.querySelectorAll('main section').forEach(sec=>sec.classList.remove('active'));
-    document.getElementById(sectionId).classList.add('active');
-}
+// Sections
+let papers=[], sharedNotes=[];
+function showSection(id){ document.querySelectorAll('main section').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 
+// Mock Upload
 function mockUpload(){
-    const fileInput = document.getElementById('pdfUpload');
-    if(!fileInput.files.length){ alert('Select a PDF'); return; }
-    const title = fileInput.files[0].name;
-    const summary = 'This is a mocked summary of the paper.';
-    const categories = ['Astrophysics','Thermodynamics'];
-    papers.push({title, summary, categories});
-    updatePaperList(); updateAnalytics();
-    alert('Paper uploaded and summarized (mock).');
+    const f=document.getElementById('pdfUpload'); if(!f.files.length){alert('Select a PDF');return;}
+    const title=f.files[0].name; const summary='Mocked summary'; const categories=['Astrophysics','Thermodynamics'];
+    papers.push({title,summary,categories}); updatePaperList(); updateAnalytics(); alert('Uploaded and summarized (mock)');
 }
 
-function updatePaperList(){
-    const ul = document.getElementById('paperList'); ul.innerHTML='';
-    papers.forEach(p=>{
-        const li = document.createElement('li');
-        li.innerHTML = `<strong>${p.title}</strong> - Categories: ${p.categories.join(', ')}`;
-        ul.appendChild(li);
-    });
-}
+// Update paper list
+function updatePaperList(){ const ul=document.getElementById('paperList'); ul.innerHTML=''; papers.forEach(p=>{ const li=document.createElement('li'); li.innerHTML=`<strong>${p.title}</strong> - Categories: ${p.categories.join(', ')}`; ul.appendChild(li); }); }
 
+// Analytics charts
 function updateAnalytics(){
-    const categoryCounts = {};
-    papers.forEach(p=>p.categories.forEach(c=>categoryCounts[c]=(categoryCounts[c]||0)+1));
-    const catCtx = document.getElementById('categoryChart').getContext('2d');
-    if(window.categoryChart) window.categoryChart.destroy();
-    window.categoryChart = new Chart(catCtx,{
-        type:'pie',
-        data:{labels:Object.keys(categoryCounts), datasets:[{data:Object.values(categoryCounts), backgroundColor:['#3b82f6','#ef4444','#10b981','#f59e0b','#8b5cf6']}]}
-    });
+    const categoryCounts={}; papers.forEach(p=>p.categories.forEach(c=>categoryCounts[c]=(categoryCounts[c]||0)+1));
+    const catCtx=document.getElementById('categoryChart').getContext('2d'); if(window.categoryChart) window.categoryChart.destroy();
+    window.categoryChart=new Chart(catCtx,{type:'pie',data:{labels:Object.keys(categoryCounts),datasets:[{data:Object.values(categoryCounts),backgroundColor:['#3b82f6','#ef4444','#10b981','#f59e0b','#8b5cf6']}]}});
 
-    const summaryLengths = papers.map(p=>p.summary.split(' ').length);
-    const sumCtx = document.getElementById('summaryChart').getContext('2d');
-    if(window.summaryChart) window.summaryChart.destroy();
-    window.summaryChart = new Chart(sumCtx,{
-        type:'bar',
-        data:{labels: papers.map(p=>p.title), datasets:[{label:'Summary Word Count', data:summaryLengths, backgroundColor:'#3b82f6'}]},
-        options:{responsive:true, plugins:{legend:{display:false}}}
-    });
+    const summaryLengths=papers.map(p=>p.summary.split(' ').length);
+    const sumCtx=document.getElementById('summaryChart').getContext('2d'); if(window.summaryChart) window.summaryChart.destroy();
+    window.summaryChart=new Chart(sumCtx,{type:'bar',data:{labels:papers.map(p=>p.title),datasets:[{label:'Summary Words',data:summaryLengths,backgroundColor:'#3b82f6'}]},options:{responsive:true,plugins:{legend:{display:false}}}});
 
-    const contribCtx = document.getElementById('teamContributionChart').getContext('2d');
-    if(window.userChart) window.userChart.destroy();
-    window.userChart = new Chart(contribCtx,{
-        type:'bar',
-        data:{labels:['You'], datasets:[{label:'Papers Uploaded', data:[papers.length], backgroundColor:'#10b981'}]},
-        options:{responsive:true, plugins:{legend:{display:false}}}
-    });
+    const contribCtx=document.getElementById('teamContributionChart').getContext('2d'); if(window.userChart) window.userChart.destroy();
+    window.userChart=new Chart(contribCtx,{type:'bar',data:{labels:['You'],datasets:[{label:'Papers Uploaded',data:[papers.length],backgroundColor:'#10b981'}]},options:{responsive:true,plugins:{legend:{display:false}}}});
 
-    const teamCatCtx = document.getElementById('teamCategoryChart').getContext('2d');
-    if(window.teamCatChart) window.teamCatChart.destroy();
-    window.teamCatChart = new Chart(teamCatCtx,{
-        type:'pie',
-        data:{labels:Object.keys(categoryCounts), datasets:[{data:Object.values(categoryCounts), backgroundColor:['#3b82f6','#ef4444','#10b981','#f59e0b','#8b5cf6']}]}
-    });
+    const teamCatCtx=document.getElementById('teamCategoryChart').getContext('2d'); if(window.teamCatChart) window.teamCatChart.destroy();
+    window.teamCatChart=new Chart(teamCatCtx,{type:'pie',data:{labels:Object.keys(categoryCounts),datasets:[{data:Object.values(categoryCounts),backgroundColor:['#3b82f6','#ef4444','#10b981','#f59e0b','#8b5cf6']}]}})
 }
 
-function shareNote(){
-    const note = document.getElementById('collabNote').
+// Collaboration
+function shareNote(){ const n=document.getElementById('collabNote').value; if(!n) return; sharedNotes.push({username:'You',note:n}); updateNotes(); document.getElementById('collabNote').value=''; }
+function updateNotes(){ const ul=document.getElementById('sharedNotes'); ul.innerHTML=''; sharedNotes.forEach(n=>{ const li=document.createElement('li'); li.innerHTML=`<strong>${n.username}:</strong> ${n.note}`; ul.appendChild(li); }); }
+</script>
+
+</body>
+</html>
