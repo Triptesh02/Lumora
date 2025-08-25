@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumora 9.0</title>
+
+<!-- Combined CSS -->
+<style>
+body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f5f5f5; }
+header { background:#3b82f6; color:white; padding:1rem; display:flex; align-items:center; gap:1rem; }
+header .logo { width:50px; height:50px; }
+nav { background:#1e40af; padding:0.5rem; }
+nav button { margin-right:0.5rem; padding:0.5rem 1rem; color:white; background:#2563eb; border:none; cursor:pointer; }
+main { padding:1rem; }
+section { margin-bottom:2rem; }
+textarea { width:100%; height:100px; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<header>
+    <img src="assets/logo.png" alt="Lumora Logo" class="logo">
+    <h1>Lumora 9.0</h1>
+</header>
+
+<nav>
+    <button onclick="showSection('dashboard')">Dashboard</button>
+    <button onclick="showSection('analytics')">Analytics</button>
+    <button onclick="showSection('collaboration')">Collaboration</button>
+</nav>
+
+<main>
+    <!-- Dashboard -->
+    <section id="dashboard">
+        <h2>Dashboard</h2>
+        <input type="file" id="pdfUpload">
+        <button onclick="mockUpload()">Upload & Summarize</button>
+        <ul id="paperList"></ul>
+    </section>
+
+    <!-- Analytics -->
+    <section id="analytics" style="display:none">
+        <h2>Analytics</h2>
+        <canvas id="categoryChart" width="400" height="200"></canvas>
+        <canvas id="summaryChart" width="400" height="200"></canvas>
+        <canvas id="teamContributionChart" width="400" height="200"></canvas>
+        <canvas id="teamCategoryChart" width="400" height="200"></canvas>
+    </section>
+
+    <!-- Collaboration -->
+    <section id="collaboration" style="display:none">
+        <h2>Collaboration Room</h2>
+        <input type="text" id="roomName" placeholder="Room Name">
+        <textarea id="collabNote" placeholder="Write a note..."></textarea>
+        <button onclick="shareNote()">Share Note</button>
+        <ul id="sharedNotes"></ul>
+    </section>
+</main>
+
+<!-- Combined JS -->
+<script>
+let papers = [];
+let sharedNotes = [];
+
+function showSection(sectionId){
+    document.querySelectorAll('main section').forEach(sec=>sec.style.display='none');
+    document.getElementById(sectionId).style.display='block';
+}
+
+function mockUpload(){
+    const fileInput = document.getElementById('pdfUpload');
+    if(!fileInput.files.length){ alert('Select a PDF'); return; }
+    const title = fileInput.files[0].name;
+    const summary = 'This is a mocked summary of the paper.';
+    const categories = ['Astrophysics','Thermodynamics'];
+    papers.push({title, summary, categories});
+    updatePaperList();
+    updateAnalytics();
+    alert('Paper uploaded and summarized (mock).');
+}
+
+function updatePaperList(){
+    const ul = document.getElementById('paperList');
+    ul.innerHTML='';
+    papers.forEach(p=>{
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${p.title}</strong> - Categories: ${p.categories.join(', ')}`;
+        ul.appendChild(li);
+    });
+}
+
+function updateAnalytics(){
+    const categoryCounts = {};
+    papers.forEach(p=>p.categories.forEach(c=>categoryCounts[c]=(categoryCounts[c]||0)+1));
+    const catCtx = document.getElementById('categoryChart').getContext('2d');
+    if(window.categoryChart) window.categoryChart.destroy();
+    window.categoryChart = new Chart(catCtx,{
+        type:'pie',
+        data:{labels:Object.keys(categoryCounts), datasets:[{data:Object.values(categoryCounts), backgroundColor:['#3b82f6','#ef4444','#10b981','#f59e0b','#8b5cf6']}]}
+    });
+
+    const summaryLengths = papers.map(p=>p.summary.split(' ').length);
+    const sumCtx = document.getElementById('summaryChart').getContext('2d');
+    if(window.summaryChart) window.summaryChart.destroy();
+    window.summaryChart = new Chart(sumCtx,{
+        type:'bar',
+        data:{labels: papers.map(p=>p.title), datasets:[{label:'Summary Word Count', data:summaryLengths, backgroundColor:'#3b82f6'}]},
+        options:{responsive:true, plugins:{legend:{display:false}}}
+    });
+
+    const contribCtx = document.getElementById('teamContributionChart').getContext('2d');
+    if(window.userChart) window.userChart.destroy();
+    window.userChart = new Chart(contribCtx,{
+        type:'bar',
+        data:{labels:['You'], datasets:[{label:'Papers Uploaded', data:[papers.length], backgroundColor:'#f59e0b'}]},
+        options:{responsive:true, plugins:{legend:{display:false}}}
+    });
+
+    const teamCatCtx = document.getElementById('teamCategoryChart').getContext('2d');
+    if(window.teamCatChart) window.teamCatChart.destroy();
+    window.teamCatChart = new Chart(teamCatCtx,{
+        type:'pie',
+        data:{labels:Object.keys(categoryCounts), datasets:[{data:Object.values(categoryCounts), backgroundColor:['#3b82f6','#ef4444','#10b981','#f59e0b','#8b5cf6']}]}
+    });
+}
+
+function shareNote(){
+    const note = document.getElementById('collabNote').value;
+    if(!note) return;
+    sharedNotes.push({username:'You', note});
+    updateNotes();
+    document.getElementById('collabNote').value='';
+}
+
+function updateNotes(){
+    const ul = document.getElementById('sharedNotes');
+    ul.innerHTML='';
+    sharedNotes.forEach(n=>{
+        const li = document.createElement('li');
+        li.innerHTML=`<strong>${n.username}:</strong> ${n.note}`;
+        ul.appendChild(li);
+    });
+}
+</script>
+
+</body>
+</html>
